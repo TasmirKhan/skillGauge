@@ -31,11 +31,14 @@ def add_title(slide, text, x=0.7, y=0.3, w=12.0, h=0.6, color=TEXT):
     r.font.color.rgb = color
 
 
-def add_textbox_lines(slide, x, y, w, h, lines, size=18, color=TEXT, bold=False, align=PP_ALIGN.LEFT, bullet=False):
-    box = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
+def add_textbox_lines(container, x=None, y=None, w=None, h=None, lines=None, size=18, color=TEXT, bold=False, align=PP_ALIGN.LEFT, bullet=False):
+    if hasattr(container, 'shapes'):
+        box = container.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
+    else:
+        box = container
     tf = box.text_frame
     tf.text = '\n'.join(lines)
-    for i, p in enumerate(tf.paragraphs):
+    for p in tf.paragraphs:
         if bullet:
             p.level = 0
             p.bullet = True
@@ -75,7 +78,7 @@ add_textbox_lines(left, 0.2, 0.2, 5.0, 3.8, [
     'Helps users revise different problems without repetition'
 ], size=20, color=TEXT, bullet=True)
 
-cyl = slide.shapes.add_shape(MSO_SHAPE.CYLINDER, Inches(7.3), Inches(1.8), Inches(4.7), Inches(3.2))
+cyl = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(7.3), Inches(1.8), Inches(4.7), Inches(3.2))
 cyl.fill.solid(); cyl.fill.fore_color.rgb = BLUE; cyl.line.color.rgb = BLUE
 cbox = slide.shapes.add_textbox(Inches(7.6), Inches(2.6), Inches(4.1), Inches(1.2))
 cb = cbox.text_frame
