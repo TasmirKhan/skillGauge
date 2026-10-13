@@ -120,17 +120,19 @@ class AssessmentService:
 
         score_result = self.scoring_service.score_submission(assessment, answers)
         for attempt_question in assessment.attempt_questions:
-            question = attempt_question.question
+            question = self.db.get(Question, attempt_question.question_id)
             selected_option = next(
                 (answer["selected_option"] for answer in answers if int(answer["question_id"]) == question.id),
                 None,
             )
-            if selected_option is not None and selected_option not in question.options_json:
-                raise ValueError(f"Invalid option for question {question.id}.")
-
-            user_answer = attempt_question.user_answer
-            if user_answer is None:
-                user_answer = attempt_question.user_answer = self.db.query(type(attempt_question.user_answer)).first() if False else None
+            valid_labels = {chr(65 + idx) for idx in range(4)}
+            if selected_option is not None:
+                normalized = str(selected_option).strip()
+                if normalized.upper() in valid_labels:
+                    continue
+                matches_option_text = any(normalized.lower() == str(option_text).lower() for option_text in question.options_json)
+                if not matches_option_text:
+                    raise ValueError(f"Invalid option for question {question.id}.")
 
         self.db.flush()
         assessment.correct_answers = score_result["correct_answers"]

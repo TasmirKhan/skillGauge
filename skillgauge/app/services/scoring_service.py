@@ -8,6 +8,27 @@ from app.models.attempt_question import AttemptQuestion
 
 
 class ScoringService:
+    @staticmethod
+    def normalize_option(question, selected_option):
+        if selected_option is None:
+            return None
+        raw = str(selected_option).strip()
+        if not raw:
+            return None
+        upper = raw.upper()
+        valid_labels = {chr(65 + idx) for idx in range(4)}
+        if upper in valid_labels:
+            return upper
+        for index, option_text in enumerate(question.options_json):
+            option_label = chr(65 + index)
+            if raw.upper() in {option_label, option_label + ".", option_label + ")"}:
+                return option_label
+            if raw.lower() == str(option_text).lower():
+                return option_label
+            if raw.lower() in str(option_text).lower().split(": ", 1)[-1].split(". ", 1)[-1]:
+                return option_label
+        return raw.upper()
+
     def score_submission(self, assessment: Assessment, answer_payload: list[dict]) -> dict:
         if not assessment.attempt_questions:
             return {
@@ -36,8 +57,9 @@ class ScoringService:
         for attempt_question in assessment.attempt_questions:
             question = attempt_question.question
             selected_option = answer_by_question.get(attempt_question.question_id)
-            is_correct = selected_option is not None and selected_option == question.correct_option
-            if selected_option is None:
+            normalized_option = self.normalize_option(question, selected_option)
+            is_correct = normalized_option is not None and normalized_option == question.correct_option.upper()
+            if selected_option is None or normalized_option is None:
                 unanswered_count += 1
             elif is_correct:
                 correct_count += 1
@@ -51,7 +73,7 @@ class ScoringService:
 
             user_answer = UserAnswer(
                 attempt_question_id=attempt_question.id,
-                selected_option=selected_option,
+                selected_option=normalized_option,
                 is_correct=is_correct,
             )
             attempt_question.user_answer = user_answer
@@ -62,7 +84,7 @@ class ScoringService:
                     "question_id": question.id,
                     "skill": skill_name,
                     "question_text": question.question_text,
-                    "selected_option": selected_option,
+                    "selected_option": normalized_option,
                     "correct_option": question.correct_option,
                     "is_correct": is_correct,
                     "explanation": question.explanation,

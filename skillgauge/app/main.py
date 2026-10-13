@@ -21,6 +21,11 @@ app.include_router(questions_router)
 app.include_router(assessments_router)
 
 
+@app.get("/health")
+def health() -> dict:
+    return {"status": "ok"}
+
+
 @app.on_event("startup")
 def initialize_application() -> None:
     init_db()

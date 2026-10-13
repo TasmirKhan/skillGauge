@@ -682,10 +682,14 @@ def seed_question_bank(db: Session) -> None:
             )
             if existing_question:
                 continue
+            labelled_options = [
+                f"{chr(65 + idx)}. {value}"
+                for idx, value in enumerate(question_entry["options"])
+            ]
             question = Question(
                 skill_id=skill.id,
                 question_text=question_entry["question_text"],
-                options_json=question_entry["options"],
+                options_json=labelled_options,
                 correct_option=question_entry["correct_option"],
                 difficulty=question_entry["difficulty"],
                 explanation=question_entry["explanation"],
