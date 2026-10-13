@@ -71,7 +71,9 @@ class AssessmentService:
             raise ValueError(f"Assessment {assessment_id} not found.")
         questions = []
         for attempt_question in sorted(assessment.attempt_questions, key=lambda item: item.question_order):
-            question = attempt_question.question
+            question = self.db.get(Question, attempt_question.question_id)
+            if question is None:
+                continue
             questions.append(
                 {
                     "id": question.id,

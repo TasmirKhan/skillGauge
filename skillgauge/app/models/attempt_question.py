@@ -16,6 +16,7 @@ class AttemptQuestion(Base):
     marks_awarded: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
 
     assessment: Mapped["Assessment"] = relationship(back_populates="attempt_questions")
+    question: Mapped["Question"] = relationship("Question")
     user_answer: Mapped["UserAnswer"] = relationship(
         back_populates="attempt_question",
         uselist=False,
