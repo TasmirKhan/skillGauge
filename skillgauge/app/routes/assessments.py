@@ -120,6 +120,7 @@ def dashboard_summary(db: Session = Depends(get_db)):
             "strongest_skill": "Not enough data",
             "needs_improvement": "Not enough data",
             "recent_history": [],
+            "skill_summary": [],
         }
 
     scores = [float(item.readiness_score) for item in assessments]
@@ -148,9 +149,14 @@ def dashboard_summary(db: Session = Depends(get_db)):
         )
         strongest_skill = skill_summary.sort_values("score", ascending=False).index[0]
         weakest_skill = skill_summary.index[0]
+        skill_summary_payload = [
+            {"skill": skill, "score": round(float(score), 2), "correct": int(row["correct"]), "total": int(row["total"])}
+            for skill, row in skill_summary.to_dict(orient="index").items()
+        ]
     else:
         strongest_skill = "Not enough data"
         weakest_skill = "Not enough data"
+        skill_summary_payload = []
 
     recent_history = [
         {
@@ -169,4 +175,5 @@ def dashboard_summary(db: Session = Depends(get_db)):
         "strongest_skill": strongest_skill,
         "needs_improvement": weakest_skill,
         "recent_history": recent_history,
+        "skill_summary": skill_summary_payload,
     }

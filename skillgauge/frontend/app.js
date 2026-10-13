@@ -160,6 +160,21 @@ function renderOverview() {
   }
 }
 
+function renderSkillsOverview() {
+  const summary = state.dashboard || { skill_summary: [] };
+  const rows = (summary.skill_summary || []).length
+    ? summary.skill_summary.map((skill) => `
+        <div class="skill-row">
+          <span>${escapeHtml(skill.skill)}</span>
+          <div class="skill-bar"><div class="skill-bar-fill" style="width:${Math.min(Number(skill.score || 0), 100)}%"></div></div>
+          <strong>${Math.round(Number(skill.score || 0))}%</strong>
+        </div>
+      `).join('')
+    : '<p>No skill data available yet.</p>';
+
+  elements.skillOverview.innerHTML = rows;
+}
+
 function renderHistoryTable() {
   if (!state.history.length) {
     elements.historyTableWrap.innerHTML = '<p>No assessment history available yet.</p>';
@@ -225,6 +240,10 @@ function openView(name) {
     history: 'Test History',
   };
   elements.pageTitle.textContent = titleMap[name] || 'Overview';
+
+  if (name === 'skills') {
+    renderSkillsOverview();
+  }
 }
 
 document.querySelectorAll('.nav-button').forEach((button) => {
@@ -431,6 +450,7 @@ async function bootstrap() {
   await loadDashboard();
   await loadHistory();
   renderOverview();
+  renderSkillsOverview();
   restoreAssessment();
 }
 
