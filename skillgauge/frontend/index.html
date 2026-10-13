@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillGauge</title>
+    <meta
+      name="description"
+      content="SkillGauge helps students and job seekers assess their technical readiness."
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-wrap">
+          <div class="brand-mark">SG</div>
+          <div>
+            <div class="brand-name">SkillGauge</div>
+            <div class="brand-subtitle">Interview readiness</div>
+          </div>
+        </div>
+
+        <nav class="nav-menu" aria-label="Main navigation">
+          <button class="nav-button active" data-view="overview">Overview</button>
+          <button class="nav-button" data-view="setup">Take Assessment</button>
+          <button class="nav-button" data-view="skills">My Skills</button>
+          <button class="nav-button" data-view="history">Test History</button>
+        </nav>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Assessment dashboard</p>
+            <h1 id="pageTitle">Overview</h1>
+          </div>
+          <button id="startAssessmentButton" class="primary-button">Start Assessment</button>
+        </header>
+
+        <section id="overviewView" class="view active">
+          <div class="hero-card card">
+            <div>
+              <p class="eyebrow text-indigo">Welcome back</p>
+              <h2>Your readiness snapshot</h2>
+            </div>
+            <button id="overviewStartButton" class="primary-button">Start new assessment</button>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-card card">
+              <span class="stat-label">Overall readiness</span>
+              <strong id="overviewScore">--</strong>
+              <small id="overviewLabel">No assessment yet</small>
+            </article>
+            <article class="stat-card card">
+              <span class="stat-label">Assessments completed</span>
+              <strong id="totalAssessments">0</strong>
+              <small>Assessment history</small>
+            </article>
+            <article class="stat-card card">
+              <span class="stat-label">Average score</span>
+              <strong id="averageScore">0%</strong>
+              <small>Across completed attempts</small>
+            </article>
+            <article class="stat-card card">
+              <span class="stat-label">Strongest skill</span>
+              <strong id="strongestSkill">N/A</strong>
+              <small id="needsImprovementText">Needs attention</small>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="card">
+              <div class="section-heading">
+                <h3>Skill performance</h3>
+              </div>
+              <div id="skillBars" class="skill-bars"></div>
+            </article>
+
+            <article class="card">
+              <div class="section-heading">
+                <h3>Recent attempts</h3>
+              </div>
+              <div id="recentAttempts" class="list-stack"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="setupView" class="view hidden">
+          <div class="card form-card">
+            <div class="section-heading">
+              <h3>Assessment setup</h3>
+            </div>
+
+            <form id="assessmentForm" class="assessment-form">
+              <div class="field-group">
+                <label for="candidateName">Candidate name</label>
+                <input id="candidateName" name="candidateName" type="text" placeholder="e.g. Alex" required />
+              </div>
+
+              <div class="field-group">
+                <label for="targetRole">Target role</label>
+                <select id="targetRole" name="targetRole">
+                  <option value="Python Developer">Python Developer</option>
+                  <option value="Java Developer">Java Developer</option>
+                  <option value="Backend Developer">Backend Developer</option>
+                  <option value="Data Analyst">Data Analyst</option>
+                  <option value="Full Stack Developer">Full Stack Developer</option>
+                  <option value="QA Engineer">QA Engineer</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label>Skills to assess</label>
+                <div id="skillSelector" class="skill-selector"></div>
+              </div>
+
+              <div class="two-column">
+                <div class="field-group">
+                  <label for="questionCount">Question count</label>
+                  <select id="questionCount" name="questionCount">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20" selected>20</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label>Difficulty preferences</label>
+                  <div class="chip-row">
+                    <label class="chip"><input type="checkbox" value="Easy" checked /> Easy</label>
+                    <label class="chip"><input type="checkbox" value="Medium" checked /> Medium</label>
+                    <label class="chip"><input type="checkbox" value="Hard" checked /> Hard</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="actions-row">
+                <button type="submit" class="primary-button">Start test</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="assessmentView" class="view hidden">
+          <div class="card assessment-card">
+            <div class="assessment-topbar">
+              <div>
+                <p class="eyebrow text-indigo">Assessment in progress</p>
+                <h3 id="assessmentHeader">Question 1</h3>
+              </div>
+              <div class="progress-pill" id="progressPill">0 / 0</div>
+            </div>
+
+            <div class="question-box">
+              <p id="questionText">Question loading...</p>
+            </div>
+
+            <div id="answerOptions" class="answer-list"></div>
+
+            <div class="actions-row assessment-actions">
+              <button id="prevQuestion" class="secondary-button">Previous</button>
+              <button id="nextQuestion" class="primary-button">Next</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="resultsView" class="view hidden">
+          <div class="results-grid">
+            <article class="card big-score-card">
+              <p class="eyebrow text-green">Result</p>
+              <h2 id="resultScore">0%</h2>
+              <p id="resultLabel">Needs improvement</p>
+            </article>
+            <article class="card result-summary-card">
+              <h3>Summary</h3>
+              <ul id="summaryList" class="summary-list"></ul>
+            </article>
+          </div>
+
+          <div class="dashboard-grid results-layout">
+            <article class="card">
+              <div class="section-heading">
+                <h3>Skill breakdown</h3>
+              </div>
+              <div id="resultSkillList" class="skill-bars"></div>
+            </article>
+            <article class="card">
+              <div class="section-heading">
+                <h3>Recommendations</h3>
+              </div>
+              <div id="recommendations" class="list-stack"></div>
+            </article>
+          </div>
+
+          <div class="card">
+            <div class="section-heading">
+              <h3>Answer review</h3>
+            </div>
+            <div id="answerReview" class="answer-review"></div>
+          </div>
+
+          <div class="actions-row">
+            <button id="retakeAssessmentButton" class="primary-button">Retake Assessment</button>
+            <button id="backToDashboardButton" class="secondary-button">Back to Dashboard</button>
+          </div>
+        </section>
+
+        <section id="skillsView" class="view hidden">
+          <div class="card">
+            <div class="section-heading">
+              <h3>Skill performance overview</h3>
+            </div>
+            <div id="skillOverview"></div>
+          </div>
+        </section>
+
+        <section id="historyView" class="view hidden">
+          <div class="card">
+            <div class="section-heading">
+              <h3>Assessment history</h3>
+            </div>
+            <div id="historyTableWrap"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
