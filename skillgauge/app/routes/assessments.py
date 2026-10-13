@@ -150,7 +150,12 @@ def dashboard_summary(db: Session = Depends(get_db)):
         strongest_skill = skill_summary.sort_values("score", ascending=False).index[0]
         weakest_skill = skill_summary.index[0]
         skill_summary_payload = [
-            {"skill": skill, "score": round(float(score), 2), "correct": int(row["correct"]), "total": int(row["total"])}
+            {
+                "skill": skill,
+                "score": round(float(row["score"]), 2),
+                "correct": int(row["correct"]),
+                "total": int(row["total"]),
+            }
             for skill, row in skill_summary.to_dict(orient="index").items()
         ]
     else:
